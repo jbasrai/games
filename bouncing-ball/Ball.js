@@ -2,13 +2,9 @@ BB.Ball = function(x, y, radius, bounciness) {
 
     this.position = new BB.Vec2(x, y);
 
-    // this.velocity = new BB.Vec2(0, 0);
+    this.velocity = new BB.Vec2(0, 0);
 
-    // this.acceleration = new BB.vec2(0, 0);
-
-    this.velocity = 0;
-
-    this.acceleration = 0;
+    this.acceleration = new BB.Vec2(0, 0);
 
     this.radius = radius;
 
@@ -19,15 +15,46 @@ BB.Ball = function(x, y, radius, bounciness) {
 BB.Ball.prototype = {
 
     step: function(dt) {
-        var y = this.position.y;
-        var v = this.velocity;
-        var a = this.acceleration;
+        var p = this.position,
+            v = this.velocity,
+            a = this.acceleration,
+            radius = this.radius,
+            isOnGround = this.isOnGround(),
+            iAcceleration = this.iAcceleration,
+            iiAcceleration = this.iiAcceleration;
 
-        var newY = (a * dt * dt / 2) + (v * dt) + y
-        var newV = a * dt + v;
+        if (isOnGround) {
+            p.y = radius;
+            v.y = 0;
+            a.y = 0;
+        }
 
-        this.position.y = newY;
-        this.velocity = newV;
+        p.add(
+            iiAcceleration(a.x, v.x, dt),
+            iiAcceleration(a.y, v.y, dt)
+        );
+
+        v.add(
+            iAcceleration(a.x, dt),
+            iAcceleration(a.y, dt)
+        );
+    },
+
+    isOnGround: function() {
+        var v = this.velocity,
+            p = this.position,
+            radius = this.radius;
+
+        return Math.abs(v.y) < 0.05 &&
+            Math.abs(p.y - radius) < 0.01;
+    },
+
+    iAcceleration: function(a, dt) {
+        return a * dt;
+    },
+
+    iiAcceleration: function(a, v, dt) {
+        return ( a * dt * dt / 2 ) + ( v * dt );
     },
 
     render: function() {

@@ -15,18 +15,10 @@ BB.World.prototype = {
     step: function(dt) {
         this.collisions.step();
 
-        this.entities
-            .forEach(function(e) {
-
-            if (e.isRestingOnGround) {
-                e.acceleration = 0;
-                e.velocity = 0;
-            } else {
-                e.acceleration = -9.8;
-            }
-
+        this.entities.forEach(function(e) {
+            e.acceleration.y = -9.8;
             e.step(dt);
-            });
+        });
     },
 
     render: function() {

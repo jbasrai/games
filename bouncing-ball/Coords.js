@@ -20,6 +20,15 @@ BB.Coords.prototype = {
         };
 
         return coords;
+    },
+
+    toWorld: function(x, y) {
+        var coords = {
+            x: x / this.scale,
+            y: (-y + this.canvasHeight) / this.scale
+        };
+
+        return coords;
     }
 
 }
