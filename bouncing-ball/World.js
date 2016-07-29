@@ -4,6 +4,10 @@ BB.World = function() {
 
     this.collisions = new BB.Collisions(this.entities);
 
+    this.gravity = 9.8;
+
+    this.friction = 0.5;
+
 };
 
 BB.World.prototype = {
@@ -16,7 +20,6 @@ BB.World.prototype = {
         this.collisions.step();
 
         this.entities.forEach(function(e) {
-            e.acceleration.y = -9.8;
             e.step(dt);
         });
     },

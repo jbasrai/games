@@ -2,7 +2,7 @@ BB.Ball = function(x, y, radius, bounciness) {
 
     this.position = new BB.Vec2(x, y);
 
-    this.velocity = new BB.Vec2(0, 0);
+    this.velocity = new BB.Vec2(1, 0);
 
     this.acceleration = new BB.Vec2(0, 0);
 
@@ -19,14 +19,26 @@ BB.Ball.prototype = {
             v = this.velocity,
             a = this.acceleration,
             radius = this.radius,
-            isOnGround = this.isOnGround(),
+            isBouncing = this.isBouncing(),
+            isRolling = this.isRolling(),
+            gravity = simulation.world.gravity,
+            friction = simulation.world.friction,
             iAcceleration = this.iAcceleration,
             iiAcceleration = this.iiAcceleration;
 
-        if (isOnGround) {
+        if (isBouncing) {
+            a.y = -gravity;
+        } else {
             p.y = radius;
             v.y = 0;
             a.y = 0;
+        }
+
+        if (isRolling) {
+            a.x = -1 * v.x / v.x * friction;
+        } else if (!isBouncing) {
+            v.x = 0;
+            a.x = 0;
         }
 
         p.add(
@@ -40,13 +52,38 @@ BB.Ball.prototype = {
         );
     },
 
-    isOnGround: function() {
-        var v = this.velocity,
-            p = this.position,
+    isBouncing: function() {
+        var p = this.position,
+            v = this.velocity,
             radius = this.radius;
 
-        return Math.abs(v.y) < 0.05 &&
-            Math.abs(p.y - radius) < 0.01;
+        return Math.abs(v.y) > 0.05 ||
+            Math.abs(p.y - radius) > 0.01;
+    },
+
+    isRolling: function() {
+        var v = this.velocity,
+            isBouncing = this.isBouncing();
+
+        return !isBouncing && Math.abs(v.x > 0.05);
+    },
+
+    hitFloor: function() {
+        var p = this.position,
+            v = this.velocity,
+            radius = this.radius,
+            bounciness = this.bounciness;
+
+        v.y = -1 * v.y * bounciness;
+    },
+
+    hitWall: function() {
+        var p = this.position,
+            v = this.velocity,
+            radius = this.radius,
+            bounciness = this.bounciness;
+
+        v.x = -1 * v.x * bounciness;
     },
 
     iAcceleration: function(a, dt) {
