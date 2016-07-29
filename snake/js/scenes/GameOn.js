@@ -54,7 +54,6 @@ SNAKE.GameOn.prototype = {
     onAppleCollide: function() {
         this.snake.grow();
         this.spawnApple();
-        // this.collisions.apple = this.apple;
         game.globalState.score = this.getScore();
     },
 
